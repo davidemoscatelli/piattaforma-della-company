@@ -346,3 +346,234 @@ a {
     transform: scale(1.03); /* Leggero ingrandimento su hover */
     transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
 }
+
+
+/* -------------------------------------------------------------------------- */
+/* STILI PER LO SLIDER DELLA HOMEPAGE (heroTrekkingSlider) - REFRESH LOOK */
+/* -------------------------------------------------------------------------- */
+#heroTrekkingSlider {
+    height: 90vh; /* O il valore che preferisci */
+    min-height: 500px; /* Altezza minima per schermi più piccoli */
+    background-color: #222; /* Sfondo di fallback scuro e neutro */
+    width: 100%;
+    position: relative;
+    overflow: hidden; /* Importante per contenere l'immagine */
+}
+
+#heroTrekkingSlider .carousel-inner { /* Aggiunto per assicurare altezza 100% */
+    height: 100%;
+}
+
+#heroTrekkingSlider .carousel-item {
+    height: 100%;
+    /* Rimuovi eventuali background-color da qui se non servono,
+       l'immagine dovrebbe coprire tutto */
+}
+
+.carousel-slide-img { /* L'immagine vera e propria */
+    height: 100%;
+    width: 100%;
+    object-fit: cover; /* Cruciale per coprire l'area mantenendo le proporzioni */
+    object-position: center center;
+}
+
+/* L'overlay ::before non dovrebbe causare la banda grigia, ma assicurati sia corretto */
+#heroTrekkingSlider .carousel-item::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    /* Scegli l'opzione di overlay che preferisci, es. il gradiente */
+    background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.30) 50%, rgba(0,0,0,0) 100%);
+    z-index: 1;
+}
+
+/* CAPTION DELLO SLIDER - Stile Moderno */
+#heroTrekkingSlider .carousel-caption {
+    position: absolute;
+    bottom: 0; /* Parte dal basso */
+    left: 0;
+    right: 0;
+    width: 100%; /* Occupa tutta la larghezza */
+    padding: 10% 8% 8%; /* Padding responsivo (percentuale) per adattarsi meglio */
+    /* Rimosso il background: linear-gradient da qui, ora è sull'overlay ::before per un effetto più globale se si sceglie Opzione 2 sopra */
+    text-align: left; /* Testo allineato a sinistra per un look più editoriale */
+    color: #fff;
+    z-index: 2;
+    display: flex; /* Usa flexbox per allineare il contenuto */
+    flex-direction: column; /* Elementi in colonna */
+    justify-content: flex-end; /* Allinea al basso */
+    align-items: flex-start; /* Allinea a sinistra */
+    height: 100%; /* Fa sì che la caption possa usare flex per posizionare in basso */
+}
+
+#heroTrekkingSlider .carousel-caption h1 {
+    font-size: clamp(2rem, 5vw, 3.8rem); /* Dimensione font responsiva: min, preferita, max */
+    font-weight: 700; /* Bold per impatto */
+    color: var(--la-company-accent, #FFFFFF); /* Colore bianco (dalla tua palette) */
+    text-shadow: 0px 2px 8px rgba(0,0,0,0.6); /* Ombra testo più definita e morbida */
+    margin-bottom: 0.75rem; /* Spazio sotto il titolo */
+    line-height: 1.2;
+}
+
+#heroTrekkingSlider .carousel-caption p.lead {
+    font-size: clamp(1rem, 2.5vw, 1.3rem); /* Dimensione font responsiva */
+    margin-bottom: 2rem; /* Più spazio prima dei pulsanti */
+    color: rgba(255,255,255,0.9); /* Bianco leggermente trasparente per il paragrafo */
+    text-shadow: 0px 1px 5px rgba(0,0,0,0.5);
+    max-width: 650px; /* Limita larghezza per leggibilità, ma allineato a sinistra */
+    line-height: 1.6;
+}
+
+#heroTrekkingSlider .carousel-caption .btn {
+    font-size: clamp(0.9rem, 2vw, 1.1rem); /* Dimensione font responsiva */
+    padding: 0.8rem clamp(1.2rem, 3vw, 2rem); /* Padding responsivo */
+    margin-top: 0.5rem; /* Spazio sopra i pulsanti se sono su righe diverse */
+    margin-right: 1rem; /* Spazio tra i pulsanti */
+    border-width: 2px; /* Bordo leggermente più spesso per i bottoni principali */
+    font-weight: 500;
+    letter-spacing: 0.5px; /* Leggera spaziatura lettere */
+}
+/* Stile specifico per il bottone primario (Dettagli) */
+#heroTrekkingSlider .carousel-caption .btn-primary {
+    /* Usa i colori primari definiti in :root */
+}
+/* Stile specifico per il bottone secondario/success (Vedi Uscite) */
+#heroTrekkingSlider .carousel-caption .btn-success {
+    background-color: #28a745; /* Un verde brillante, puoi usare una tua variabile se hai un verde secondario */
+    border-color: #28a745;
+}
+#heroTrekkingSlider .carousel-caption .btn-success:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+}
+
+
+/* Controlli e Indicatori Carousel - Manteniamo quelli precedenti che erano già buoni */
+#heroTrekkingSlider .carousel-control-prev-icon,
+#heroTrekkingSlider .carousel-control-next-icon {
+    background-color: rgba(0, 0, 0, 0.35);
+    border-radius: 50%;
+    padding: 1.75rem;
+    background-size: 50% 50%;
+    transition: background-color 0.2s ease;
+}
+#heroTrekkingSlider .carousel-control-prev-icon:hover,
+#heroTrekkingSlider .carousel-control-next-icon:hover {
+    background-color: rgba(0, 0, 0, 0.55);
+}
+#heroTrekkingSlider .carousel-indicators [data-bs-target] {
+    background-color: rgba(255,255,255,0.7);
+    border: 1px solid rgba(0,0,0,0.2);
+    width: 30px;  /* Larghezza della barra */
+    height: 6px;   /* Altezza della barra (più sottile di un cerchio) */
+    border-radius: 3px; /* Leggermente arrotondato, o 0 per spigoli vivi */
+    margin: 0 4px;     /* Spazio tra le barre */
+    opacity: 0.7;
+    transition: opacity 0.2s ease, background-color 0.2s ease;
+}
+
+#heroTrekkingSlider .carousel-indicators .active {
+    background-color: white;
+    opacity: 1;
+}
+
+/* Media query per schermi più piccoli per aggiustare le dimensioni del testo nello slider */
+@media (max-width: 768px) {
+    #heroTrekkingSlider {
+        height: 75vh; /* Un po' meno alto su mobile */
+        min-height: 450px;
+    }
+    #heroTrekkingSlider .carousel-caption {
+        padding: 15% 5% 10%; /* Padding ridotto per mobile */
+        text-align: center; /* Testo centrato su mobile per semplicità */
+        align-items: center; /* Centra gli elementi flex su mobile */
+    }
+    #heroTrekkingSlider .carousel-caption h1 {
+        font-size: clamp(1.6rem, 6vw, 2.5rem); /* Titolo più piccolo su mobile */
+    }
+    #heroTrekkingSlider .carousel-caption p.lead {
+        font-size: clamp(0.9rem, 3vw, 1.1rem); /* Descrizione più piccola */
+        margin-bottom: 1.5rem;
+        max-width: 100%; /* Occupa tutta la larghezza disponibile */
+    }
+    #heroTrekkingSlider .carousel-caption .btn {
+        font-size: clamp(0.8rem, 2.5vw, 1rem);
+        padding: 0.7rem clamp(1rem, 4vw, 1.5rem);
+        margin-bottom: 0.5rem; /* Spazio sotto i bottoni se vanno a capo */
+        width: auto; /* Permetti ai bottoni di non essere full-width */
+        display: inline-block; /* Assicura che siano affiancati se c'è spazio */
+    }
+    #heroTrekkingSlider .carousel-caption p:last-child { /* Paragrafo contenente i bottoni */
+        display: flex;
+        flex-direction: column; /* Bottoni in colonna su mobile */
+        align-items: center;
+    }
+    #heroTrekkingSlider .carousel-caption .btn + .btn { /* Rimuovi margine destro se i bottoni sono in colonna */
+        margin-right: 0;
+        margin-left: 0; /* Rimuovi anche eventuale margine sinistro */
+    }
+}
+
+/* STILI PER IL CALENDARIO FULLCALENDAR SULLA HOMEPAGE (Opzionale)          */
+/* -------------------------------------------------------------------------- */
+/* Questi stili erano nel blocco extra_css di home.html, li ho spostati qui per centralizzazione */
+#homepage-calendar-container {
+    padding-top: 2rem;
+    padding-bottom: 3rem;
+    background-color: var(--la-company-bg-light); /* Sfondo per la sezione calendario */
+}
+
+#homepage-calendar { /* Il div che contiene FullCalendar */
+    max-width: 1100px; /* Limita la larghezza massima del calendario */
+    margin: 0 auto;    /* Centra il calendario */
+    background-color: var(--la-company-bg-white); /* Sfondo bianco per il calendario stesso */
+    padding: 1.5rem;   /* Padding interno attorno al calendario */
+    border-radius: var(--la-company-border-radius); /* Bordi arrotondati */
+    box-shadow: var(--la-company-box-shadow);       /* Ombra */
+}
+
+/* Stili per gli eventi nel calendario FullCalendar (puoi personalizzarli) */
+.fc-event { /* Classe generica per gli eventi */
+    cursor: pointer;
+    font-size: 0.85em; /* Testo un po' più piccolo per non affollare */
+    border-width: 1px; /* Bordo sottile per gli eventi */
+    /* FullCalendar gestisce i colori degli eventi tramite la proprietà 'color' nell'oggetto evento,
+       ma puoi sovrascrivere l'aspetto di base qui se vuoi. */
+}
+
+.fc-event:hover {
+    opacity: 0.85; /* Leggera trasparenza su hover */
+}
+
+/* Stili per i tooltip di Bootstrap usati con FullCalendar (se li usi) */
+.tooltip.event-tooltip .tooltip-inner { /* Classe custom 'event-tooltip' che avevamo nello script JS */
+    background-color: var(--la-company-primary-darker); /* Sfondo scuro per il tooltip */
+    color: var(--la-company-accent); /* Testo bianco */
+    border-radius: var(--la-company-border-radius);
+    padding: 0.5rem 0.75rem;
+    max-width: 300px; /* Larghezza massima tooltip */
+    text-align: left;
+}
+.tooltip.event-tooltip .tooltip-arrow::before {
+    border-top-color: var(--la-company-primary-darker); /* Freccia del tooltip scura */
+}
+
+/* Personalizzazione dei bottoni dell'header di FullCalendar (opzionale) */
+#homepage-calendar .fc-button-primary { /* I bottoni standard di FullCalendar */
+    background-color: var(--la-company-primary);
+    border-color: var(--la-company-primary);
+    text-transform: capitalize; /* Rende la prima lettera maiuscola */
+}
+#homepage-calendar .fc-button-primary:hover {
+    background-color: var(--la-company-primary-darker);
+    border-color: var(--la-company-primary-darker);
+}
+#homepage-calendar .fc-button-primary:not(:disabled).fc-button-active,
+#homepage-calendar .fc-button-primary:not(:disabled):active { /* Bottone attivo (es. vista corrente) */
+    background-color: var(--la-company-primary-darker);
+    border-color: var(--la-company-primary-darker);
+    box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+}

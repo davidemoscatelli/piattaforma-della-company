@@ -8,7 +8,9 @@ from django.utils import timezone
 from django.urls import reverse
 from django.http import JsonResponse # Per API FullCalendar (se la usi)
 import datetime # Per API FullCalendar (se la usi)
-
+from django.http import JsonResponse
+from django.urls import reverse
+from datetime import datetime, time # Aggiungi time
 
 def home_page(request):
     featured_treks = Trek.objects.filter(is_published=True).order_by('-created_at')[:3]
@@ -165,26 +167,44 @@ def registration_success(request):
     }
     return render(request, 'trekking/registration_success.html', context)
 
-# API per FullCalendar (se la implementerai in futuro)
-# def scheduled_events_api(request):
-#     scheduled_treks = ScheduledTrek.objects.filter(is_active=True)
-#     events = []
-#     for st in scheduled_treks:
-#         event_title = st.trek.name
-#         if st.event_status not in ['PIANIFICATO', 'CONFERMATO']:
-#             event_title = f"{st.trek.name} ({st.get_event_status_display()})"
+def trekking_events_json(request):
+    """
+    Fornisce le uscite programmate in formato JSON per FullCalendar.
+    """
+    # Considera di filtrare solo eventi futuri o rilevanti
+    # scheduled_treks = ScheduledTrek.objects.filter(date__gte=datetime.today(), event_status__in=['PIANIFICATO', 'CONFERMATO']).order_by('date')
+    scheduled_treks = ScheduledTrek.objects.filter(event_status__in=['PIANIFICATO', 'CONFERMATO', 'POSTI_ESAURITI']).order_by('date') # Mostra anche quelli pieni
 
-#         color = None
-#         if hasattr(st.trek, 'difficulty') and st.trek.difficulty and hasattr(st.trek.difficulty, 'color_hex'): # Aggiungi campo color_hex a Difficulty
-#             color = st.trek.difficulty.color_hex
+    events = []
+    for st in scheduled_treks:
+        event_title = st.trek.name
+        event_start_datetime = datetime.combine(st.date, st.start_time if st.start_time else time.min) # Combina data e ora, usa mezzanotte se l'ora non è specificata
 
-#         events.append({
-#             'id': st.pk,
-#             'title': event_title,
-#             'start': datetime.datetime.combine(st.date, st.start_time).isoformat(),
-#             'url': reverse('trekking:trek_detail', args=[st.trek.slug]), # Link al dettaglio del trek
-#             'description': f"Guida: {st.guide_name or 'N/A'}<br>Posti: {st.spots_available}/{st.max_participants}",
-#             'status': st.get_event_status_display(),
-#             'color': color if color else ('#dc3545' if 'ANNULLATO' in st.event_status else ('#6c757d' if st.event_status == 'COMPLETATO' else None))
-#         })
-#     return JsonResponse(events, safe=False)
+        # Determina il colore dell'evento in base allo stato o disponibilità
+        event_color = None
+        if st.event_status == 'POSTI_ESAURITI':
+            event_color = '#dc3545' # Rosso per posti esauriti
+            event_title += " (Esaurito)"
+        elif st.spots_available is not None and st.max_participants is not None and st.spots_available <= 5 and st.spots_available > 0 :
+            event_color = '#ffc107' # Giallo per pochi posti
+            event_title += f" (Solo {st.spots_available} posti!)"
+        elif st.event_status == 'CONFERMATO':
+            event_color = '#28a745' # Verde per confermato
+
+
+        events.append({
+            'id': st.pk,
+            'title': event_title,
+            'start': event_start_datetime.isoformat(), # Formato ISO per FullCalendar
+            'url': reverse('trekking:trek_detail', args=[st.trek.slug]), # Link alla pagina di dettaglio del trek
+            'extendedProps': { # Puoi aggiungere dati extra qui
+                'description': st.trek.description_short,
+                'spots_available': st.spots_available,
+                'max_participants': st.max_participants,
+                'status': st.get_event_status_display(),
+                'registration_url': reverse('trekking:trek_registration_create', args=[st.pk])
+            },
+            'color': event_color, # Colore opzionale per l'evento
+            # 'allDay': False se vuoi specificare orari, altrimenti FullCalendar lo gestisce
+        })
+    return JsonResponse(events, safe=False)

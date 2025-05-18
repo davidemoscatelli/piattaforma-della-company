@@ -11,19 +11,12 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-LANGUAGE_CODE = 'it-it' # Imposta la lingua italiana
 
-TIME_ZONE = 'Europe/Rome' # Imposta il fuso orario italiano
-
-USE_I18N = True
-
-USE_L10N = True # Importante per la formattazione corretta di date e numeri in italiano
-
-USE_TZ = True
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
@@ -113,11 +106,13 @@ AUTH_PASSWORD_VALIDATORS = [
 # Internationalization
 # https://docs.djangoproject.com/en/5.1/topics/i18n/
 
-LANGUAGE_CODE = 'en-us'
+LANGUAGE_CODE = 'it-it' # Imposta la lingua italiana
 
-TIME_ZONE = 'UTC'
+TIME_ZONE = 'Europe/Rome' # Imposta il fuso orario italiano
 
 USE_I18N = True
+
+USE_L10N = True # Importante per la formattazione corretta di date e numeri in italiano
 
 USE_TZ = True
 
@@ -127,7 +122,15 @@ USE_TZ = True
 
 STATIC_URL = 'static/'
 
+# Media files (File caricati dagli utenti, come trek.main_image)
+# https://docs.djangoproject.com/en/5.1/topics/files/
+
+MEDIA_URL = '/media/' # <-- AGGIUNTO: URL base per servire i file media
+MEDIA_ROOT = os.path.join(BASE_DIR, 'media') # <-- AGGIUNTO: Percorso nel filesystem dove verranno salvati i file media
+
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
