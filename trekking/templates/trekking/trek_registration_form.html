@@ -1,0 +1,86 @@
+{% extends "trekking/base.html" %}
+{% load static %} {# Se usi crispy_forms, potresti non aver bisogno di iterare i campi manualmente #}
+
+{% block title %}{{ page_title|default:"Modulo di Iscrizione" }} - La Company{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8 col-lg-7">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0 text-center">{{ page_title }}</h3>
+                </div>
+                <div class="card-body p-4">
+                    <p class="lead text-center">Stai per iscriverti all'uscita:</p>
+                    <div class="text-center mb-3">
+                        <h4 class="text-secondary">{{ scheduled_trek.trek.name }}</h4>
+                        <p class="mb-0"><i class="bi bi-calendar-event"></i> {{ scheduled_trek.date|date:"l, d F Y" }} alle {{ scheduled_trek.start_time|time:"H:i" }}</p>
+                        <p><i class="bi bi-geo-alt"></i> Ritrovo: {{ scheduled_trek.meeting_point_specific }}</p>
+                        {% if scheduled_trek.spots_available <= 5 and scheduled_trek.spots_available > 0 %}
+                            <p class="text-warning fw-bold"><i class="bi bi-exclamation-triangle"></i> Attenzione: solo {{ scheduled_trek.spots_available }} posti rimasti!</p>
+                        {% endif %}
+                    </div>
+                    <hr>
+
+                    <form method="post" novalidate>
+                        {% csrf_token %} {# Importante per la sicurezza! #}
+
+                    
+
+                        {# Modo più compatto se usi le classi Bootstrap nei widget del form #}
+                        {% for hidden_field in form.hidden_fields %}
+                            {{ hidden_field }}
+                        {% endfor %}
+
+                        {% if form.non_field_errors %}
+                            <div class="alert alert-danger">
+                                {% for error in form.non_field_errors %}
+                                    <p>{{ error }}</p>
+                                {% endfor %}
+                            </div>
+                        {% endif %}
+
+                        <div class="mb-3">
+                            <label for="{{ form.first_name.id_for_label }}" class="form-label">{{ form.first_name.label }}</label>
+                            {{ form.first_name }}
+                            {% if form.first_name.errors %}<div class="invalid-feedback d-block">{% for error in form.first_name.errors %}{{ error }}{% endfor %}</div>{% endif %}
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ form.last_name.id_for_label }}" class="form-label">{{ form.last_name.label }}</label>
+                            {{ form.last_name }}
+                            {% if form.last_name.errors %}<div class="invalid-feedback d-block">{% for error in form.last_name.errors %}{{ error }}{% endfor %}</div>{% endif %}
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ form.email.id_for_label }}" class="form-label">{{ form.email.label }}</label>
+                            {{ form.email }}
+                            {% if form.email.errors %}<div class="invalid-feedback d-block">{% for error in form.email.errors %}{{ error }}{% endfor %}</div>{% endif %}
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ form.phone.id_for_label }}" class="form-label">{{ form.phone.label }}</label>
+                            {{ form.phone }}
+                            {% if form.phone.errors %}<div class="invalid-feedback d-block">{% for error in form.phone.errors %}{{ error }}{% endfor %}</div>{% endif %}
+                        </div>
+                        <div class="mb-3">
+                            <label for="{{ form.notes_user.id_for_label }}" class="form-label">{{ form.notes_user.label }}</label>
+                            {{ form.notes_user }}
+                            {% if form.notes_user.errors %}<div class="invalid-feedback d-block">{% for error in form.notes_user.errors %}{{ error }}{% endfor %}</div>{% endif %}
+                        </div>
+
+                       
+
+                        <div class="d-grid gap-2">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="bi bi-check2-circle"></i> Conferma Iscrizione
+                            </button>
+                            <a href="{% url 'trekking:trek_detail' scheduled_trek.trek.slug %}" class="btn btn-outline-secondary">
+                                Annulla
+                            </a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

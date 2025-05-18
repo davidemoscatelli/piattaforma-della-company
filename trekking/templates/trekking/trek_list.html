@@ -1,0 +1,97 @@
+{% extends "trekking/base.html" %}
+{% load static %}
+
+{% block title %}{{ page_title|default:"Tutti i Percorsi" }} - La Company{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4 text-center display-6">{{ page_title|default:"I Nostri Percorsi" }}</h2>
+
+    <form method="get" action="{% url 'trekking:trek_list' %}" class="mb-4 p-3 bg-light rounded-3 shadow-sm">
+        <div class="row g-3 align-items-end">
+            <div class="col-md-4">
+                <label for="filterDifficulty" class="form-label fw-bold">Difficoltà:</label>
+                <select name="difficulty" class="form-select" id="filterDifficulty">
+                    <option value="">Tutte le Difficoltà</option>
+                    {% for diff in difficulties %}
+                        <option value="{{ diff.pk }}" {% if diff.pk == selected_difficulty_id %}selected{% endif %}>
+                            {{ diff.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-md-4">
+                <label for="filterLocation" class="form-label fw-bold">Località/Area:</label>
+                <input type="text" name="location_area" class="form-control" id="filterLocation" placeholder="Es. Dolomiti, Appennino" value="{{ search_location_value|default:'' }}">
+            </div>
+            <div class="col-md-3">
+                <label for="sortOrder" class="form-label fw-bold">Ordina per:</label>
+                <select name="sort" class="form-select" id="sortOrder">
+                    <option value="name" {% if current_sort == 'name' %}selected{% endif %}>Nome (A-Z)</option>
+                    <option value="-name" {% if current_sort == '-name' %}selected{% endif %}>Nome (Z-A)</option>
+                    <option value="difficulty" {% if current_sort == 'difficulty' %}selected{% endif %}>Difficoltà</option>
+                    <option value="length" {% if current_sort == 'length' %}selected{% endif %}>Lunghezza (Crescente)</option>
+                    <option value="-length" {% if current_sort == '-length' %}selected{% endif %}>Lunghezza (Decrescente)</option>
+                </select>
+            </div>
+            <div class="col-md-1 d-grid">
+                <button type="submit" class="btn btn-primary">Filtra</button>
+            </div>
+        </div>
+    </form>
+    
+
+    {% if treks %}
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4"> {# Griglia Bootstrap per le card #}
+            {% for trek in treks %}
+                <div class="col">
+                    <div class="card h-100 trek-card shadow-sm">
+                         <a href="{% url 'trekking:trek_detail' trek.slug %}">
+                            {% if trek.main_image %}
+                                <img src="{{ trek.main_image.url }}" class="card-img-top" alt="{{ trek.name }}">
+                            {% else %}
+                                <img src="{% static 'trekking/img/placeholder_trek.jpg' %}" class="card-img-top" alt="Immagine per {{ trek.name }}">
+                                {# Assicurati di avere trekking/static/trekking/img/placeholder_trek.jpg #}
+                            {% endif %}
+                        </a>
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title">
+                                <a href="{% url 'trekking:trek_detail' trek.slug %}" class="text-decoration-none text-primary stretched-link">{{ trek.name }}</a>
+                            </h5>
+                            <p class="card-text text-muted small mb-2">
+                                <i class="bi bi-tags"></i>
+                                Difficoltà: {{ trek.difficulty.name|default:"N/D" }}
+                            </p>
+                            <p class="card-text flex-grow-1">{{ trek.description_short|truncatewords:20 }}</p>
+                             
+                            <a href="{% url 'trekking:trek_detail' trek.slug %}" class="btn btn-sm btn-outline-secondary mt-auto align-self-start">Dettagli <i class="bi bi-arrow-right-short"></i></a>
+                            
+                        </div>
+                        {% if trek.length_km or trek.elevation_gain_meters %}
+                        <div class="card-footer text-body-secondary small">
+                            {% if trek.length_km %}
+                                <i class="bi bi-rulers"></i> {{ trek.length_km }} km
+                            {% endif %}
+                            {% if trek.elevation_gain_meters and trek.length_km %} | {% endif %}
+                            {% if trek.elevation_gain_meters %}
+                                <i class="bi bi-arrow-up-right-circle"></i> {{ trek.elevation_gain_meters }} m D+
+                            {% endif %}
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+      
+
+    {% else %}
+        <div class="alert alert-light text-center mt-4 shadow-sm" role="alert">
+            <i class="bi bi-binoculars fs-1 d-block mb-2"></i>
+            <h4 class="alert-heading">Nessun Percorso Trovato</h4>
+            <p>Nessun percorso corrisponde ai criteri di ricerca selezionati. Prova a modificare i filtri.</p>
+            <a href="{% url 'trekking:trek_list' %}" class="btn btn-outline-secondary mt-2">Rimuovi tutti i filtri</a>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

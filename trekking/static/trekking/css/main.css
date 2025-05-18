@@ -1,0 +1,348 @@
+/* trekking/static/trekking/css/main.css */
+
+/* -------------------------------------------------------------------------- */
+/* PALETTE COLORI E VARIABILI BASE                                        */
+/* -------------------------------------------------------------------------- */
+:root {
+    /* Colori derivati dal logo La Company */
+    --la-company-primary: #224b7c; /* Blu scuro/medio dal logo */
+    --la-company-primary-darker: #1b3a62; /* Una tonalità più scura per hover/elementi attivi */
+    --la-company-accent: #FFFFFF; /* Bianco, come nel logo */
+
+    /* Colori di supporto */
+    --la-company-text: #333A40; /* Grigio scuro per testo leggibile */
+    --la-company-text-muted: #6c757d; /* Grigio per testo secondario */
+    --la-company-bg-light: #f8f9fa; /* Grigio chiarissimo per sfondi sezione */
+    --la-company-bg-white: #FFFFFF;
+    --la-company-border-color: #dee2e6; /* Colore standard per bordi */
+
+    /* Stile elementi UI */
+    --la-company-border-radius: 0.5rem; /* Bordi arrotondati consistenti */
+    --la-company-box-shadow: 0 0.25rem 0.75rem rgba(0, 0, 0, 0.06); /* Ombra delicata */
+    --la-company-box-shadow-hover: 0 0.4rem 1rem rgba(0, 0, 0, 0.08); /* Ombra più marcata per hover */
+
+    /* Override colori Bootstrap (opzionale, ma utile per coerenza) */
+    --bs-primary: var(--la-company-primary);
+    --bs-primary-rgb: 34, 75, 124; /* Valori RGB di --bs-primary (#224b7c) */
+    --bs-secondary: #526a8b; /* Un blu-grigio secondario più tenue, da personalizzare */
+    --bs-secondary-rgb: 82, 106, 139;
+    --bs-body-color: var(--la-company-text);
+    --bs-body-font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, "Helvetica Neue", Arial, sans-serif;
+    --bs-link-color: var(--la-company-primary);
+    --bs-link-hover-color: var(--la-company-primary-darker);
+    --bs-border-radius: var(--la-company-border-radius);
+    --bs-border-radius-sm: calc(var(--la-company-border-radius) * 0.75);
+    --bs-border-radius-lg: calc(var(--la-company-border-radius) * 1.25);
+    --bs-border-radius-pill: 50rem; /* Per i badge */
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* STILI GLOBALI                                                              */
+/* -------------------------------------------------------------------------- */
+body {
+    font-family: var(--bs-body-font-family);
+    background-color: #eef2f5; /* Sfondo corpo leggermente testurizzato/diverso dal bianco puro */
+    color: var(--la-company-text);
+    line-height: 1.6;
+}
+
+h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6 {
+    color: var(--la-company-primary-darker); /* Titoli con un colore leggermente più scuro */
+    font-weight: 600; /* Titoli leggermente più bold */
+}
+
+a {
+    transition: color 0.2s ease-in-out;
+}
+
+/* -------------------------------------------------------------------------- */
+/* PERSONALIZZAZIONE COMPONENTI BOOTSTRAP                                   */
+/* -------------------------------------------------------------------------- */
+
+/* Navbar */
+.navbar {
+    box-shadow: var(--la-company-box-shadow);
+}
+/* Assicura che la Navbar stia sopra altri elementi sticky */
+.navbar.sticky-top,
+.navbar.fixed-top {
+    z-index: 1031 !important;
+}
+.navbar-dark .navbar-nav .nav-link {
+    transition: color 0.2s ease;
+}
+.navbar-dark .navbar-nav .nav-link.active,
+.navbar-dark .navbar-nav .nav-link:hover {
+    color: var(--la-company-accent); /* Bianco per link attivi/hover su sfondo scuro navbar */
+}
+/* Colori per classi bg-* usate in HTML */
+.bg-primary {
+    background-color: var(--bs-primary) !important;
+}
+.text-primary {
+    color: var(--bs-primary) !important;
+}
+.border-primary {
+    border-color: var(--bs-primary) !important;
+}
+/* Navbar con colore secondario (usiamo il primary-darker per coerenza) */
+.navbar.bg-secondary { /* Se la navbar usa .bg-secondary */
+    background-color: var(--la-company-primary-darker) !important;
+}
+
+
+/* Bottoni */
+.btn {
+    border-radius: var(--bs-border-radius);
+    box-shadow: var(--la-company-box-shadow);
+    transition: transform 0.15s ease-out, box-shadow 0.15s ease-out, background-color 0.2s ease, border-color 0.2s ease;
+    padding: 0.5rem 1rem; /* Padding di base per i bottoni */
+    font-weight: 500;
+}
+.btn:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--la-company-box-shadow-hover);
+}
+.btn-primary {
+    background-color: var(--bs-primary);
+    border-color: var(--bs-primary);
+    color: var(--la-company-accent); /* Testo bianco per bottoni primari */
+}
+.btn-primary:hover {
+    background-color: var(--la-company-primary-darker);
+    border-color: var(--la-company-primary-darker);
+    color: var(--la-company-accent);
+}
+.btn-success {
+    background-color: #198754;
+    border-color: #198754;
+    color: var(--la-company-accent);
+}
+.btn-success:hover {
+    background-color: #157347;
+    border-color: #146c43;
+    color: var(--la-company-accent);
+}
+.btn-outline-secondary {
+    border-color: var(--bs-secondary);
+    color: var(--bs-secondary);
+}
+.btn-outline-secondary:hover {
+    background-color: var(--bs-secondary);
+    color: var(--la-company-accent);
+}
+
+
+/* Card */
+.card {
+    border: 1px solid var(--la-company-border-color);
+    border-radius: var(--bs-border-radius);
+    box-shadow: var(--la-company-box-shadow);
+    transition: box-shadow 0.2s ease-in-out;
+    background-color: var(--la-company-bg-white); /* Sfondo bianco per le card */
+}
+.card:hover {
+    box-shadow: var(--la-company-box-shadow-hover);
+}
+.card-header {
+    background-color: var(--la-company-bg-light);
+    border-bottom: 1px solid var(--la-company-border-color);
+    padding: 0.75rem 1.25rem;
+}
+/* Stile per card-header quando ha bg-primary (come nella sidebar "Riepilogo Trekking") */
+.card-header.bg-primary {
+    color: var(--la-company-accent) !important; /* Testo bianco di default per gli elementi figli */
+}
+.card-header.bg-primary h1,
+.card-header.bg-primary h2,
+.card-header.bg-primary h3,
+.card-header.bg-primary h4, /* Questa è quella che ci interessa */
+.card-header.bg-primary h5,
+.card-header.bg-primary h6,
+.card-header.bg-primary i { /* Applica specificamente anche alle icone */
+    color: var(--la-company-accent) !important; /* Forza il colore bianco */
+}
+
+.card.trek-card .card-img-top { /* Per le card dei trekking nelle liste */
+    height: 220px;
+    object-fit: cover;
+    border-top-left-radius: var(--bs-border-radius);
+    border-top-right-radius: var(--bs-border-radius);
+}
+
+
+/* Breadcrumb */
+.breadcrumb {
+    background-color: var(--la-company-bg-white); /* Sfondo più pulito */
+    padding: 0.75rem 1.25rem;
+    border-radius: var(--bs-border-radius);
+    box-shadow: var(--la-company-box-shadow);
+    margin-bottom: 1.5rem; /* Più spazio sotto */
+}
+.breadcrumb-item a {
+    text-decoration: none;
+}
+
+
+/* List Group (usato per elenco uscite programmate) */
+.list-group-item {
+    border-color: var(--la-company-border-color);
+    padding: 1rem 1.25rem; /* Più padding interno */
+}
+.list-group-item-action:hover, .list-group-item-action:focus {
+    background-color: #eef2f5; /* Un grigio leggermente più scuro di la-company-bg-light */
+    color: var(--la-company-primary-darker);
+}
+
+
+/* Tabs / Pills (usati in trek_detail.html) */
+.nav-pills .nav-link {
+    border-radius: var(--bs-border-radius);
+    color: var(--la-company-primary);
+    background-color: transparent;
+    border: 1px solid transparent; /* Rimosso bordo di default per tab non attivi */
+    margin-right: 0.5rem;   /* Spazio orizzontale tra i tab */
+    margin-bottom: 0.5rem;  /* Spazio verticale se i tab vanno a capo */
+    padding: 0.65rem 1.25rem; /* Padding interno per i tab, più bilanciato */
+    font-weight: 500;
+    transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+.nav-pills .nav-link:last-child { /* Opzionale: rimuove margine extra dall'ultimo tab */
+    margin-right: 0;
+}
+.nav-pills .nav-link:hover {
+    background-color: var(--la-company-bg-light); /* Sfondo leggero su hover */
+    border-color: var(--la-company-border-color); /* Bordo leggero su hover */
+    color: var(--la-company-primary-darker);
+}
+.nav-pills .nav-link.active {
+    background-color: var(--la-company-primary);
+    color: var(--la-company-accent); /* Testo bianco su sfondo primario */
+    box-shadow: var(--la-company-box-shadow);
+    border-color: var(--la-company-primary);
+}
+.tab-content {
+    background-color: var(--la-company-bg-white);
+    padding: 1.5rem;
+    border: 1px solid var(--la-company-border-color);
+    border-top: none;
+    border-radius: 0 0 var(--bs-border-radius) var(--bs-border-radius);
+    box-shadow: var(--la-company-box-shadow);
+}
+
+
+/* Form */
+.form-control, .form-select {
+    border-radius: var(--bs-border-radius);
+    border: 1px solid #ced4da; /* Bordo standard Bootstrap */
+    padding: 0.5rem 0.75rem; /* Padding standard */
+}
+.form-control:focus, .form-select:focus {
+    border-color: var(--la-company-primary);
+    box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25);
+}
+.form-label {
+    font-weight: 500;
+    margin-bottom: 0.5rem;
+}
+
+
+/* Alert */
+.alert {
+    border-radius: var(--bs-border-radius);
+    box-shadow: var(--la-company-box-shadow);
+    padding: 1rem;
+}
+
+
+/* -------------------------------------------------------------------------- */
+/* STILI SPECIFICI PER ELEMENTI DELL'APP                                      */
+/* -------------------------------------------------------------------------- */
+
+/* Footer */
+.site-footer { /* Se usi questa classe in base.html */
+    /* Le classi bg-dark e text-white di Bootstrap sono già buone */
+}
+.site-footer a {
+    color: #adb5bd; /* Grigio chiaro per link su sfondo scuro */
+    transition: color 0.2s ease;
+}
+.site-footer a:hover {
+    color: var(--la-company-accent); /* Bianco su hover */
+}
+
+
+/* Pagina Dettaglio Trekking (trek_detail.html) */
+.trek-hero-img {
+    width: 100%; /* Occupa tutta la larghezza del suo contenitore (col-lg-8) */
+    max-height: 450px; /* O l'altezza che preferisci */
+    object-fit: cover; /* Mantiene le proporzioni e copre l'area, tagliando se necessario */
+    border-radius: var(--la-company-border-radius);
+    box-shadow: var(--la-company-box-shadow-hover); /* Ombra più marcata per l'immagine principale */
+    display: block; /* Per evitare spazi extra sotto l'immagine */
+}
+
+.key-details-bar {
+    background-color: var(--la-company-bg-light);
+    padding: 1rem 1.5rem; /* Padding per la barra dettagli */
+    border-radius: var(--la-company-border-radius);
+    border: 1px solid var(--la-company-border-color);
+    box-shadow: var(--la-company-box-shadow);
+}
+.key-details-bar .detail-item {
+    /* margin-right gestito da classe 'gap-*' sull'elemento padre HTML */
+    font-size: 0.95rem;
+}
+.key-details-bar .detail-item i {
+    color: var(--la-company-primary); /* Icone con colore primario */
+    vertical-align: middle; /* Migliora allineamento verticale */
+    margin-right: 0.3rem; /* Spazio tra icona e testo */
+}
+
+/* Sezione "Prossime Uscite Programmate" nella pagina di dettaglio */
+.content-section.bg-body-tertiary {
+    background-color: var(--la-company-bg-light) !important; /* Sfondo leggero */
+    border-radius: var(--la-company-border-radius);
+    box-shadow: var(--la-company-box-shadow);
+    padding: 1.5rem; /* Padding interno */
+}
+
+
+#map { /* Div della mappa Leaflet */
+    height: 400px; /* Altezza minima per la mappa, puoi aumentarla */
+    min-height: 350px;
+    border-radius: var(--la-company-border-radius);
+    box-shadow: var(--la-company-box-shadow);
+    border: 1px solid var(--la-company-border-color);
+    background-color: #e9ecef; /* Sfondo placeholder se la mappa non carica */
+}
+
+/* Sidebar sticky in trek_detail.html */
+.sticky-sidebar-content {
+    max-height: calc(100vh - 100px); /* 100px = circa top offset navbar + un po' di margine */
+    overflow-y: auto;
+    padding-right: 5px; /* Piccola spaziatura se appare la scrollbar */
+}
+/* Rendi la scrollbar della sidebar un po' meno invadente (solo Webkit) */
+.sticky-sidebar-content::-webkit-scrollbar {
+    width: 6px;
+}
+.sticky-sidebar-content::-webkit-scrollbar-thumb {
+    background-color: var(--la-company-border-color);
+    border-radius: 3px;
+}
+.sticky-sidebar-content::-webkit-scrollbar-track {
+    background-color: transparent;
+}
+
+
+/* Immagini nella galleria (modal) */
+.modal-content {
+    border-radius: var(--la-company-border-radius);
+}
+.hover-shadow:hover { /* Per le thumbnail della galleria */
+    box-shadow: var(--la-company-box-shadow-hover) !important;
+    transform: scale(1.03); /* Leggero ingrandimento su hover */
+    transition: transform 0.2s ease-out, box-shadow 0.2s ease-out;
+}

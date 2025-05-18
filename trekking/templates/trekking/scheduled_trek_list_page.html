@@ -1,0 +1,102 @@
+{% extends "trekking/base.html" %}
+{% load static %}
+
+{% block title %}{{ page_title|default:"Calendario Uscite" }} - La Company{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="mb-4 text-center display-6">{{ page_title|default:"Calendario Uscite Programmate" }}</h2>
+
+    {% if scheduled_treks %}
+        <div class="list-group shadow-sm">
+            {% for st in scheduled_treks %}
+                <div class="list-group-item list-group-item-action flex-column align-items-start mb-3 border rounded position-relative
+                            {% if st.event_status == 'ANNULLATO_METEO' or st.event_status == 'ANNULLATO_ORGANIZZATORE' %}border-danger opacity-75{% elif st.event_status == 'COMPLETATO' %}border-secondary opacity-75{% elif st.event_status == 'CONFERMATO' %}border-success{% else %}border-info{% endif %}">
+                    <div class="row g-0">
+                        <div class="col-md-3 text-center bg-light p-3 d-flex flex-column justify-content-center border-end">
+                            {% if st.trek.main_image %}
+                                <a href="{% url 'trekking:trek_detail' st.trek.slug %}">
+                                <img src="{{ st.trek.main_image.url }}" alt="{{ st.trek.name }}" class="img-fluid rounded mb-2" style="max-height: 120px; object-fit: cover;">
+                                </a>
+                            {% else %}
+                                <a href="{% url 'trekking:trek_detail' st.trek.slug %}">
+                                <img src="{% static 'trekking/img/placeholder_trek.jpg' %}" class="img-fluid rounded mb-2" style="max-height: 120px; object-fit: cover;" alt="Placeholder">
+                                </a>
+                            {% endif %}
+                            <h5 class="mb-1">
+                                <a href="{% url 'trekking:trek_detail' st.trek.slug %}" class="text-decoration-none">{{ st.trek.name }}</a>
+                            </h5>
+                            <small class="text-muted">
+                                <i class="bi bi-tags"></i> {{ st.trek.difficulty.name|default:"N/D" }}
+                            </small>
+                        </div>
+                        <div class="col-md-9 p-3 ps-md-4">
+                            <div class="d-flex w-100 justify-content-between align-items-start mb-2">
+                                <h4 class="mb-1 text-primary"><i class="bi bi-calendar-event"></i> {{ st.date|date:"l, d F Y" }}</h4>
+                                <span class="badge ms-2
+                                    {% if st.event_status == 'CONFERMATO' %}bg-success
+                                    {% elif st.event_status == 'ANNULLATO_METEO' or st.event_status == 'ANNULLATO_ORGANIZZATORE' %}bg-danger
+                                    {% elif st.event_status == 'COMPLETATO' %}bg-secondary
+                                    {% else %}bg-info text-dark{% endif %}
+                                    fs-6">{{ st.get_event_status_display }}</span>
+                            </div>
+                             {% if st.price > 0 %}
+                                <p class="fs-5 fw-bold text-success mb-1">{{ st.price }} €</p>
+                            {% else %}
+                                <p class="badge bg-success fs-6 mb-1">Gratuito</p>
+                            {% endif %}
+                            <p class="mb-1"><i class="bi bi-clock text-muted"></i> <strong>Orario Ritrovo:</strong> {{ st.start_time|time:"H:i" }}</p>
+                            <p class="mb-1"><i class="bi bi-geo-alt-fill text-muted"></i> <strong>Punto Ritrovo:</strong> {{ st.meeting_point_specific }}</p>
+                            {% if st.guide_name %}
+                                <p class="mb-1"><i class="bi bi-person-check text-muted"></i> <strong>Guida:</strong> {{ st.guide_name }}</p>
+                            {% endif %}
+                            <p class="mb-2">
+                                <i class="bi bi-people text-muted"></i> <strong>Posti:</strong>
+                                <span class="fw-bold">{{ st.spots_available }}</span> / {{ st.max_participants }}
+                                {% if st.event_status != 'ANNULLATO_METEO' and st.event_status != 'ANNULLATO_ORGANIZZATORE' and st.event_status != 'COMPLETATO' %}
+                                    {% if st.spots_available > 0 and st.spots_available <= 5 and st.registration_open %}
+                                        <span class="badge bg-warning text-dark ms-1">Pochi posti rimasti!</span>
+                                    {% elif st.spots_available > 0 and st.registration_open %}
+                                        <span class="badge bg-success ms-1">Disponibili</span>
+                                    {% elif not st.registration_open and st.spots_available > 0 %}
+                                        <span class="badge bg-secondary ms-1">Iscrizioni Chiuse</span>
+                                    {% else %}
+                                        <span class="badge bg-danger ms-1">Posti Esauriti</span>
+                                    {% endif %}
+                                {% endif %}
+                            </p>
+
+                            <div class="mt-3">
+                                <a href="{% url 'trekking:trek_detail' st.trek.slug %}" class="btn btn-outline-secondary btn-sm me-2">
+                                    <i class="bi bi-info-circle"></i> Dettagli Trek
+                                </a>
+                                {% if st.event_status == 'PIANIFICATO' or st.event_status == 'CONFERMATO' %}
+                                    {% if st.registration_open and st.spots_available > 0 %}
+                                        <a href="{% url 'trekking:trek_registration_create' st.pk %}" class="btn btn-primary btn-sm">
+                                            <i class="bi bi-check2-circle"></i> Iscriviti Ora!
+                                        </a>
+                                    {% elif not st.registration_open and st.spots_available > 0 %}
+                                         <button class="btn btn-secondary btn-sm" disabled>Iscrizioni Chiuse</button>
+                                    {% else %}
+                                        <button class="btn btn-danger btn-sm" disabled>Posti Esauriti</button>
+                                    {% endif %}
+                                {% elif st.event_status == 'ANNULLATO_METEO' or st.event_status == 'ANNULLATO_ORGANIZZATORE' %}
+                                    <button class="btn btn-danger btn-sm" disabled><i class="bi bi-x-octagon-fill"></i> Uscita Annullata</button>
+                                {% elif st.event_status == 'COMPLETATO' %}
+                                     <button class="btn btn-light border btn-sm" disabled><i class="bi bi-check-all"></i> Uscita Completata</button>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+        <div class="alert alert-light text-center mt-4 shadow-sm" role="alert">
+            <i class="bi bi-calendar-x fs-1 d-block mb-2"></i>
+            <h4 class="alert-heading">Nessuna Uscita Programmata</h4>
+            <p>Al momento non ci sono uscite in programma che corrispondono ai criteri. Torna a trovarci presto o <a href="#" class="alert-link">contattaci</a> per richieste personalizzate!</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,26 @@
+{% extends "trekking/base.html" %}
+
+{% block title %}{{ page_title|default:"Iscrizione Completata" }} - La Company{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8 text-center">
+            <div class="py-5 px-4 bg-light rounded-3 shadow-sm">
+                <i class="bi bi-check-circle-fill text-success display-1 mb-3"></i>
+                <h2 class="display-6 fw-bold">{{ page_title|default:"Richiesta Inviata!" }}</h2>
+                {# Il messaggio specifico di successo viene mostrato dal blocco 'messages' in base.html #}
+                <p class="lead my-3">
+                    Grazie per esserti iscritto! Controlla la tua email per una conferma (a breve implementeremo l'invio email).
+                </p>
+                <p>Ti aspettiamo per questa fantastica avventura!</p>
+                <hr class="my-4">
+                <div class="d-grid gap-2 d-sm-flex justify-content-sm-center">
+                    <a href="{% url 'trekking:home_page' %}" class="btn btn-primary btn-lg px-4">Torna alla Homepage</a>
+                    <a href="{% url 'trekking:scheduled_trek_list' %}" class="btn btn-outline-secondary btn-lg px-4">Vedi Altre Uscite</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
