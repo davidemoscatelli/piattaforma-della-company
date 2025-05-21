@@ -1,12 +1,31 @@
 {% extends "trekking/base.html" %}
-{% load static %} {# Se usi crispy_forms, potresti non aver bisogno di iterare i campi manualmente #}
+{% load static %}
 
 {% block title %}{{ page_title|default:"Modulo di Iscrizione" }} - La Company{% endblock %}
 
+{% block extra_css %}
+<style>
+    .non-member-fields {
+        padding-left: 1.5rem;
+        border-left: 3px solid var(--bs-primary-border-subtle, #cfe2ff); /* Usa variabile Bootstrap se disponibile o colore fallback */
+        margin-left: -3px; /* Per allineare il bordo se il padding del genitore è diverso */
+        padding-bottom: 1rem;
+        margin-bottom: 1rem;
+        margin-top: 1rem;
+    }
+    /* Inizialmente nascondi i campi che dipendono da JS per essere mostrati,
+       JS li mostrerà se necessario al caricamento della pagina. */
+    #nonMemberFields:not(.js-initialized),
+    #carSeatsField:not(.js-initialized) {
+        display: none;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container mt-4">
+<div class="container mt-4 mb-5">
     <div class="row justify-content-center">
-        <div class="col-md-8 col-lg-7">
+        <div class="col-md-9 col-lg-8">
             <div class="card shadow-sm">
                 <div class="card-header bg-primary text-white">
                     <h3 class="mb-0 text-center">{{ page_title }}</h3>
@@ -15,65 +34,127 @@
                     <p class="lead text-center">Stai per iscriverti all'uscita:</p>
                     <div class="text-center mb-3">
                         <h4 class="text-secondary">{{ scheduled_trek.trek.name }}</h4>
-                        <p class="mb-0"><i class="bi bi-calendar-event"></i> {{ scheduled_trek.date|date:"l, d F Y" }} alle {{ scheduled_trek.start_time|time:"H:i" }}</p>
+                        <p class="mb-0"><i class="bi bi-calendar-event"></i> {{ scheduled_trek.date|date:"l, d F Y" }} {% if scheduled_trek.start_time %}alle {{ scheduled_trek.start_time|time:"H:i" }}{% endif %}</p>
                         <p><i class="bi bi-geo-alt"></i> Ritrovo: {{ scheduled_trek.meeting_point_specific }}</p>
-                        {% if scheduled_trek.spots_available <= 5 and scheduled_trek.spots_available > 0 %}
+                        {% if scheduled_trek.spots_available <= 5 and scheduled_trek.spots_available > 0 and scheduled_trek.can_register %}
                             <p class="text-warning fw-bold"><i class="bi bi-exclamation-triangle"></i> Attenzione: solo {{ scheduled_trek.spots_available }} posti rimasti!</p>
                         {% endif %}
                     </div>
                     <hr>
 
                     <form method="post" novalidate>
-                        {% csrf_token %} {# Importante per la sicurezza! #}
-
-                    
-
-                        {# Modo più compatto se usi le classi Bootstrap nei widget del form #}
-                        {% for hidden_field in form.hidden_fields %}
-                            {{ hidden_field }}
-                        {% endfor %}
+                        {% csrf_token %}
 
                         {% if form.non_field_errors %}
                             <div class="alert alert-danger">
-                                {% for error in form.non_field_errors %}
-                                    <p>{{ error }}</p>
-                                {% endfor %}
+                                {% for error in form.non_field_errors %}<p class="mb-0">{{ error }}</p>{% endfor %}
                             </div>
                         {% endif %}
 
-                        <div class="mb-3">
-                            <label for="{{ form.first_name.id_for_label }}" class="form-label">{{ form.first_name.label }}</label>
-                            {{ form.first_name }}
-                            {% if form.first_name.errors %}<div class="invalid-feedback d-block">{% for error in form.first_name.errors %}{{ error }}{% endfor %}</div>{% endif %}
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.first_name.id_for_label }}" class="form-label">{{ form.first_name.label }}:<span class="text-danger">*</span></label>
+                                {{ form.first_name }}
+                                {% if form.first_name.errors %}<div class="invalid-feedback d-block">{% for error in form.first_name.errors %}{{ error }}{% endfor %}</div>{% endif %}
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="{{ form.last_name.id_for_label }}" class="form-label">{{ form.last_name.label }}:<span class="text-danger">*</span></label>
+                                {{ form.last_name }}
+                                {% if form.last_name.errors %}<div class="invalid-feedback d-block">{% for error in form.last_name.errors %}{{ error }}{% endfor %}</div>{% endif %}
+                            </div>
                         </div>
                         <div class="mb-3">
-                            <label for="{{ form.last_name.id_for_label }}" class="form-label">{{ form.last_name.label }}</label>
-                            {{ form.last_name }}
-                            {% if form.last_name.errors %}<div class="invalid-feedback d-block">{% for error in form.last_name.errors %}{{ error }}{% endfor %}</div>{% endif %}
-                        </div>
-                        <div class="mb-3">
-                            <label for="{{ form.email.id_for_label }}" class="form-label">{{ form.email.label }}</label>
+                            <label for="{{ form.email.id_for_label }}" class="form-label">{{ form.email.label }}:<span class="text-danger">*</span></label>
                             {{ form.email }}
                             {% if form.email.errors %}<div class="invalid-feedback d-block">{% for error in form.email.errors %}{{ error }}{% endfor %}</div>{% endif %}
                         </div>
                         <div class="mb-3">
-                            <label for="{{ form.phone.id_for_label }}" class="form-label">{{ form.phone.label }}</label>
+                            <label for="{{ form.phone.id_for_label }}" class="form-label">{{ form.phone.label }}:</label>
                             {{ form.phone }}
                             {% if form.phone.errors %}<div class="invalid-feedback d-block">{% for error in form.phone.errors %}{{ error }}{% endfor %}</div>{% endif %}
                         </div>
+                        
+                        <hr class="my-4">
+
                         <div class="mb-3">
-                            <label for="{{ form.notes_user.id_for_label }}" class="form-label">{{ form.notes_user.label }}</label>
+                            <p class="form-label fw-bold">{{ form.is_member.label }}:<span class="text-danger">*</span></p>
+                            {% for radio in form.is_member %}
+                            <div class="form-check form-check-inline">
+                                {{ radio.tag }}
+                                <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
+                            </div>
+                            {% endfor %}
+                            {% if form.is_member.errors %}<div class="invalid-feedback d-block">{% for error in form.is_member.errors %}{{ error }}{% endfor %}</div>{% endif %}
+                        </div>
+
+                        <div id="nonMemberFields" class="non-member-fields">
+                            <h5 class="mb-3 text-primary">Dati aggiuntivi per non soci</h5>
+                            <div class="mb-3">
+                                <label for="{{ form.birth_date.id_for_label }}" class="form-label">{{ form.birth_date.label }}:<span class="text-danger js-required-indicator" style="display:none;">*</span></label>
+                                {{ form.birth_date }}
+                                {% if form.birth_date.errors %}<div class="invalid-feedback d-block">{% for error in form.birth_date.errors %}{{ error }}{% endfor %}</div>{% endif %}
+                            </div>
+                            <div class="mb-3">
+                                <label for="{{ form.birth_place.id_for_label }}" class="form-label">{{ form.birth_place.label }}:<span class="text-danger js-required-indicator" style="display:none;">*</span></label>
+                                {{ form.birth_place }}
+                                {% if form.birth_place.errors %}<div class="invalid-feedback d-block">{% for error in form.birth_place.errors %}{{ error }}{% endfor %}</div>{% endif %}
+                            </div>
+                            <div class="mb-3">
+                                <label for="{{ form.address.id_for_label }}" class="form-label">{{ form.address.label }}:<span class="text-danger js-required-indicator" style="display:none;">*</span></label>
+                                {{ form.address }}
+                                {% if form.address.errors %}<div class="invalid-feedback d-block">{% for error in form.address.errors %}{{ error }}{% endfor %}</div>{% endif %}
+                            </div>
+                            <div class="row">
+                                <div class="col-md-8 mb-3">
+                                    <label for="{{ form.city.id_for_label }}" class="form-label">{{ form.city.label }}:<span class="text-danger js-required-indicator" style="display:none;">*</span></label>
+                                    {{ form.city }}
+                                    {% if form.city.errors %}<div class="invalid-feedback d-block">{% for error in form.city.errors %}{{ error }}{% endfor %}</div>{% endif %}
+                                </div>
+                                <div class="col-md-4 mb-3">
+                                    <label for="{{ form.postal_code.id_for_label }}" class="form-label">{{ form.postal_code.label }}:<span class="text-danger js-required-indicator" style="display:none;">*</span></label>
+                                    {{ form.postal_code }}
+                                    {% if form.postal_code.errors %}<div class="invalid-feedback d-block">{% for error in form.postal_code.errors %}{{ error }}{% endfor %}</div>{% endif %}
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label for="{{ form.fiscal_code.id_for_label }}" class="form-label">{{ form.fiscal_code.label }}:<span class="text-danger js-required-indicator" style="display:none;">*</span></label>
+                                {{ form.fiscal_code }}
+                                {% if form.fiscal_code.errors %}<div class="invalid-feedback d-block">{% for error in form.fiscal_code.errors %}{{ error }}{% endfor %}</div>{% endif %}
+                            </div>
+                        </div>
+                        
+                        <hr class="my-4">
+
+                        <div class="mb-3">
+                            <p class="form-label fw-bold">{{ form.has_car.label }}:<span class="text-danger">*</span></p>
+                             {% for radio in form.has_car %}
+                            <div class="form-check form-check-inline">
+                                {{ radio.tag }}
+                                <label class="form-check-label" for="{{ radio.id_for_label }}">{{ radio.choice_label }}</label>
+                            </div>
+                            {% endfor %}
+                            {% if form.has_car.errors %}<div class="invalid-feedback d-block">{% for error in form.has_car.errors %}{{ error }}{% endfor %}</div>{% endif %}
+                        </div>
+
+                        <div id="carSeatsField" class="mb-3 car-seats-field">
+                            <label for="{{ form.available_seats.id_for_label }}" class="form-label">{{ form.available_seats.label }}:</label>
+                            {{ form.available_seats }}
+                            {% if form.available_seats.errors %}<div class="invalid-feedback d-block">{% for error in form.available_seats.errors %}{{ error }}{% endfor %}</div>{% endif %}
+                        </div>
+                        
+                        <hr class="my-4">
+                        
+                        <div class="mb-3">
+                            <label for="{{ form.notes_user.id_for_label }}" class="form-label">{{ form.notes_user.label }}:</label>
                             {{ form.notes_user }}
                             {% if form.notes_user.errors %}<div class="invalid-feedback d-block">{% for error in form.notes_user.errors %}{{ error }}{% endfor %}</div>{% endif %}
                         </div>
 
-                       
-
-                        <div class="d-grid gap-2">
+                        <div class="d-grid gap-2 mt-4">
                             <button type="submit" class="btn btn-primary btn-lg">
                                 <i class="bi bi-check2-circle"></i> Conferma Iscrizione
                             </button>
-                            <a href="{% url 'trekking:trek_detail' scheduled_trek.trek.slug %}" class="btn btn-outline-secondary">
+                            <a href="{{ scheduled_trek.trek.get_absolute_url|default:'javascript:history.back()' }}" class="btn btn-outline-secondary">
                                 Annulla
                             </a>
                         </div>
@@ -83,4 +164,65 @@
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const isMemberRadios = document.querySelectorAll('input[name="{{ form.is_member.html_name }}"]'); // Usa html_name
+    const nonMemberFieldsDiv = document.getElementById('nonMemberFields');
+    const nonMemberRequiredIndicators = nonMemberFieldsDiv.querySelectorAll('.js-required-indicator');
+
+    const hasCarRadios = document.querySelectorAll('input[name="{{ form.has_car.html_name }}"]'); // Usa html_name
+    const carSeatsFieldDiv = document.getElementById('carSeatsField');
+    const availableSeatsInput = document.getElementById('{{ form.available_seats.id_for_label }}');
+
+    function toggleNonMemberFields() {
+        const selectedValue = document.querySelector('input[name="{{ form.is_member.html_name }}"]:checked').value;
+        if (selectedValue === 'False') { // Confronta con la stringa 'False'
+            nonMemberFieldsDiv.style.display = 'block';
+            nonMemberFieldsDiv.classList.add('js-initialized');
+            nonMemberRequiredIndicators.forEach(ind => ind.style.display = 'inline');
+        } else {
+            nonMemberFieldsDiv.style.display = 'none';
+            nonMemberRequiredIndicators.forEach(ind => ind.style.display = 'none');
+        }
+    }
+
+    function toggleCarSeatsField() {
+        const selectedValue = document.querySelector('input[name="{{ form.has_car.html_name }}"]:checked').value;
+        if (selectedValue === 'True') { // Confronta con la stringa 'True'
+            carSeatsFieldDiv.style.display = 'block';
+            carSeatsFieldDiv.classList.add('js-initialized');
+            if(availableSeatsInput) availableSeatsInput.removeAttribute('disabled');
+        } else {
+            carSeatsFieldDiv.style.display = 'none';
+            if(availableSeatsInput) {
+                availableSeatsInput.setAttribute('disabled', 'disabled');
+                // availableSeatsInput.value = 0; // Lo gestisce il form/modello
+            }
+        }
+    }
+
+    isMemberRadios.forEach(radio => radio.addEventListener('change', toggleNonMemberFields));
+    // Stato iniziale corretto se il form viene ricaricato con errori o valori pre-esistenti
+    const currentIsMember = document.querySelector('input[name="{{ form.is_member.html_name }}"]:checked');
+    if (currentIsMember) {
+        toggleNonMemberFields();
+    } else { // Se nessun radio è selezionato (es. al primo caricamento), nascondi di default
+         if (nonMemberFieldsDiv) nonMemberFieldsDiv.style.display = 'none';
+         nonMemberRequiredIndicators.forEach(ind => ind.style.display = 'none');
+    }
+
+
+    hasCarRadios.forEach(radio => radio.addEventListener('change', toggleCarSeatsField));
+    const currentHasCar = document.querySelector('input[name="{{ form.has_car.html_name }}"]:checked');
+    if (currentHasCar) {
+        toggleCarSeatsField();
+    } else { // Se nessun radio è selezionato, nascondi di default
+        if (carSeatsFieldDiv) carSeatsFieldDiv.style.display = 'none';
+        if(availableSeatsInput) availableSeatsInput.setAttribute('disabled', 'disabled');
+    }
+});
+</script>
 {% endblock %}

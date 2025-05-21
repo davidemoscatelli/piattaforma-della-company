@@ -1,0 +1,95 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <title>Modulo Iscrizione - {{ registration.scheduled_trek.trek.name }}</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; line-height: 1.4; font-size: 10pt; }
+        .header { text-align: center; margin-bottom: 30px; }
+        .header img { max-height: 70px; margin-bottom: 10px; }
+        .header h1 { font-size: 16pt; margin-bottom: 5px; color: #333; }
+        .header h2 { font-size: 14pt; margin-bottom: 20px; color: #555; }
+        .section { margin-bottom: 15px; padding-bottom: 10px; border-bottom: 1px dotted #ccc; }
+        .section:last-of-type { border-bottom: none; }
+        .section h3 { font-size: 12pt; color: #224b7c; margin-bottom: 10px; border-bottom: 1px solid #eee; padding-bottom: 5px;}
+        .label { font-weight: bold; min-width: 180px; display: inline-block; }
+        .value { margin-left: 10px; }
+        p { margin: 5px 0; }
+        .data-pair { margin-bottom: 5px; }
+        .disclaimer { margin-top: 30px; font-size: 9pt; border: 1px solid #ddd; padding: 10px; background-color: #f9f9f9; }
+        .signature-section { margin-top: 40px; }
+        .signature-box { margin-top: 10px; padding-top: 10px; border-top: 1px solid #555; width: 70%; }
+        .footer-info { margin-top: 30px; font-size: 8pt; text-align: center; color: #777; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        {# Per l'immagine del logo, assicurati che il percorso sia corretto e che 'image.png' sia il nome del tuo logo #}
+        <img src="{% static 'trekking/img/image.png' %}" alt="Logo La Company">
+        <h1>Modulo di Adesione Escursione</h1>
+        <h2>Associazione "La Company"</h2>
+    </div>
+
+    <div class="section">
+        <h3>Dati Escursione</h3>
+        <p class="data-pair"><span class="label">Nome Trekking:</span><span class="value">{{ registration.scheduled_trek.trek.name }}</span></p>
+        <p class="data-pair"><span class="label">Data Uscita:</span><span class="value">{{ registration.scheduled_trek.date|date:"l, d F Y" }}{% if registration.scheduled_trek.start_time %} alle {{ registration.scheduled_trek.start_time|time:"H:i" }}{% endif %}</span></p>
+        <p class="data-pair"><span class="label">Guida/Accompagnatore:</span><span class="value">{{ registration.scheduled_trek.guide_name|default:"Non specificato" }}</span></p>
+    </div>
+
+    <div class="section">
+        <h3>Dati Partecipante</h3>
+        <p class="data-pair"><span class="label">Cognome e Nome:</span><span class="value">{{ registration.last_name|upper }} {{ registration.first_name }}</span></p>
+        <p class="data-pair"><span class="label">Email:</span><span class="value">{{ registration.email }}</span></p>
+        <p class="data-pair"><span class="label">Telefono:</span><span class="value">{{ registration.phone|default:"Non fornito" }}</span></p>
+        <p class="data-pair"><span class="label">Socio "La Company"?</span><span class="value">{% if registration.is_member %}Sì{% else %}No{% endif %}</span></p>
+    </div>
+
+    {% if not registration.is_member %}
+    <div class="section">
+        <h3>Dati Aggiuntivi (per non socio - necessari per attivazione assicurativa giornaliera)</h3>
+        <p class="data-pair"><span class="label">Data di Nascita:</span><span class="value">{{ registration.birth_date|date:"d/m/Y"|default:"Non fornito" }}</span></p>
+        <p class="data-pair"><span class="label">Luogo di Nascita:</span><span class="value">{{ registration.birth_place|default:"Non fornito" }}</span></p>
+        <p class="data-pair"><span class="label">Indirizzo di Residenza:</span><span class="value">{{ registration.address|default:"Non fornito" }}</span></p>
+        <p class="data-pair"><span class="label">Città:</span><span class="value">{{ registration.city|default:"Non fornito" }}</span></p>
+        <p class="data-pair"><span class="label">CAP:</span><span class="value">{{ registration.postal_code|default:"Non fornito" }}</span></p>
+        <p class="data-pair"><span class="label">Codice Fiscale:</span><span class="value">{{ registration.fiscal_code|upper|default:"Non fornito" }}</span></p>
+    </div>
+    {% endif %}
+    
+    <div class="section">
+        <h3>Informazioni Aggiuntive Fornite</h3>
+        <p class="data-pair"><span class="label">Disponibilità Auto:</span><span class="value">{% if registration.has_car %}Sì{% else %}No{% endif %}</span></p>
+        {% if registration.has_car %}
+        <p class="data-pair"><span class="label">Posti Auto Offerti (oltre guidatore):</span><span class="value">{{ registration.available_seats|default:"0" }}</span></p>
+        {% endif %}
+        {% if registration.notes_user %}
+        <p><span class="label">Note del Partecipante:</span></p>
+        <p style="white-space: pre-wrap; margin-left: 20px;">{{ registration.notes_user }}</p>
+        {% else %}
+        <p class="data-pair"><span class="label">Note del Partecipante:</span><span class="value">Nessuna</span></p>
+        {% endif %}
+    </div>
+
+    <div class="disclaimer">
+        <p><strong>Dichiarazioni e Consenso:</strong></p>
+        <p>Il sottoscritto dichiara di aver preso visione del programma dell'escursione, di essere in possesso dei requisiti fisici e tecnici necessari, di disporre dell'equipaggiamento indicato e di accettare il regolamento dell'associazione "La Company" (se disponibile, consultabile su [link al regolamento o specificare dove trovarlo]).</p>
+        <p>Dichiara inoltre di essere consapevole dei rischi oggettivi e soggettivi connessi alla pratica dell'attività escursionistica in ambiente montano e di sollevare l'associazione "La Company" e i suoi accompagnatori/guide da ogni responsabilità per eventuali incidenti o danni che dovessero verificarsi a persone o cose, salvo i casi di dolo o colpa grave degli accompagnatori stessi.</p>
+        <p>[ ] Consenso al trattamento dei dati personali per finalità associative e assicurative ai sensi del GDPR (Reg. UE 2016/679). L'informativa completa è disponibile presso [specificare dove].</p>
+        {# Aggiungi qui altre clausole specifiche della tua associazione #}
+    </div>
+    
+    <div class="signature-section">
+        <p><span class="label">Data:</span> <span style="border-bottom: 1px solid #555; padding: 0 50px;">&nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;&nbsp;/&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</span></p>
+        <div class="signature-box">
+            <p><span class="label">Firma del Partecipante (o del genitore/tutore esercente la potestà per i minori):</span></p>
+            <br><br>
+            <p style="border-top: 1px solid #555;">&nbsp;</p>
+        </div>
+    </div>
+    <div class="footer-info">
+        La Company - Trekking e Avventura - [Tuo Indirizzo/Sito Web/Contatti Associazione]
+    </div>
+</body>
+</html>

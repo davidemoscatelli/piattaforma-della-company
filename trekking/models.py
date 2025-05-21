@@ -180,12 +180,33 @@ class TrekRegistration(models.Model):
         ('ANNULLATA_ADMIN', 'Annullata (Admin)'),
         ('COMPLETATA', 'Completata'),
     ]
+
     scheduled_trek = models.ForeignKey(ScheduledTrek, related_name='registrations', on_delete=models.CASCADE, verbose_name="Uscita Programmata")
-    user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True, verbose_name="Utente Registrato")
+    user = models.ForeignKey(User, on_delete=models.SET_NULL, blank=True, null=True, verbose_name="Utente Registrato (se loggato)")
+
+    # Dati base richiesti a tutti
     first_name = models.CharField(max_length=100, verbose_name="Nome")
     last_name = models.CharField(max_length=100, verbose_name="Cognome")
     email = models.EmailField(verbose_name="Email")
     phone = models.CharField(max_length=20, blank=True, null=True, verbose_name="Telefono")
+
+    # NUOVI CAMPI
+    is_member = models.BooleanField(default=False, verbose_name="È Socio de 'La Company'?")
+    
+    # Campi aggiuntivi per NON SOCI (per iscrizione associazione/assicurazione giornaliera)
+    # Questi campi saranno richiesti solo se is_member = False
+    birth_date = models.DateField(verbose_name="Data di Nascita", blank=True, null=True)
+    birth_place = models.CharField(max_length=100, verbose_name="Luogo di Nascita", blank=True, null=True)
+    address = models.CharField(max_length=255, verbose_name="Indirizzo di Residenza (Via, N°)", blank=True, null=True)
+    city = models.CharField(max_length=100, verbose_name="Città di Residenza", blank=True, null=True)
+    postal_code = models.CharField(max_length=10, verbose_name="CAP", blank=True, null=True)
+    fiscal_code = models.CharField(max_length=16, verbose_name="Codice Fiscale", blank=True, null=True)
+    # Aggiungi altri campi necessari per l'iscrizione/assicurazione (es. consenso privacy specifico, ecc.)
+
+    # Campi relativi all'auto
+    has_car = models.BooleanField(default=False, verbose_name="Disponibilità Auto?")
+    available_seats = models.PositiveIntegerField(verbose_name="N° Posti Auto Disponibili (oltre al guidatore)", default=0, blank=True, null=True)
+    
     registration_date = models.DateTimeField(auto_now_add=True, verbose_name="Data Iscrizione")
     status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='CONFERMATA', verbose_name="Stato Iscrizione")
     notes_user = models.TextField(blank=True, null=True, verbose_name="Note dall'Utente")
@@ -195,7 +216,9 @@ class TrekRegistration(models.Model):
         verbose_name = "Iscrizione Trekking"
         verbose_name_plural = "Iscrizioni Trekking"
         ordering = ['-registration_date']
-        unique_together = [['scheduled_trek', 'email']]
+        # Rimosso unique_together temporaneamente se causa problemi con formset o logiche complesse,
+        # oppure gestisci l'unicità a livello di vista/form.
+        # unique_together = [['scheduled_trek', 'email']] # Attenzione se un socio si iscrive e poi non socio con stessa email
 
     def __str__(self):
         user_info = self.user.username if self.user else f"{self.first_name} {self.last_name}"
@@ -206,4 +229,20 @@ class TrekRegistration(models.Model):
             self.first_name = self.user.first_name if self.user.first_name else ''
             self.last_name = self.user.last_name if self.user.last_name else ''
             self.email = self.user.email if self.user.email else ''
+        
+        # Se non è socio, alcuni campi diventano "obbligatori" a livello logico,
+        # ma la validazione avverrà nel form.
+        if self.is_member:
+            # Pulisci i campi da non socio se per caso erano stati compilati
+            self.birth_date = None
+            self.birth_place = None
+            self.address = None
+            self.city = None
+            self.postal_code = None
+            self.fiscal_code = None
+        
+        # Se non ha auto, i posti disponibili sono 0
+        if not self.has_car:
+            self.available_seats = 0
+            
         super().save(*args, **kwargs)
