@@ -1,6 +1,7 @@
 import os
 from django.db import migrations
 from django.contrib.auth import get_user_model
+# from django.conf import settings # Aggiungi se usi migrations.swappable_dependency(settings.AUTH_USER_MODEL)
 
 def create_superuser(apps, schema_editor):
     User = get_user_model()
@@ -33,24 +34,38 @@ def remove_superuser(apps, schema_editor):
     DJANGO_SUPERUSER_USERNAME = os.environ.get('DJANGO_SUPERUSER_USERNAME', 'admin')
     try:
         user = User.objects.get(username=DJANGO_SUPERUSER_USERNAME)
-        if user.is_superuser: # Rimuovi solo se è effettivamente il superutente che abbiamo creato
+        # Controlla se è un superutente prima di considerare la rimozione,
+        # e magari solo se è quello che questa migrazione avrebbe creato.
+        if user.is_superuser:
             # user.delete() # ATTENZIONE: questo cancellerebbe l'utente. Valuta se è desiderato.
-            print(f"Operazione di rimozione per superutente {DJANGO_SUPERUSER_USERNAME} non implementata per sicurezza.")
+            print(f"Operazione di rimozione per superutente {DJANGO_SUPERUSER_USERNAME} non implementata esplicitamente per sicurezza.")
             pass
     except User.DoesNotExist:
+        print(f"Superutente {DJANGO_SUPERUSER_USERNAME} non trovato durante il tentativo di rimozione.")
         pass
 
 
 class Migration(migrations.Migration):
 
     dependencies = [
-        # Assicurati che questa dipendenza sia l'ultima migrazione della tua app 'trekking'
-        # o l'ultima migrazione dell'app 'auth' se non hai altre migrazioni in 'trekking'.
-        # Se hai appena creato il campo 'registration_deadline', la dipendenza sarà quella.
-        # Esempio: ('trekking', '0002_auto_YYYYMMDD_HHMM'), 
-        # O se è la prima migrazione di trekking e non hai dipendenze da altre app:
-        # ('auth', '0012_alter_user_first_name_max_length'), # Ultima migrazione di auth
-        migrations.swappable_dependency(migrations. государмы('auth', 'user')), # Dipende dal modello User di auth
+        # Sostituisci '0004_nome_migrazione_precedente' con il nome effettivo 
+        # della migrazione 0004 della tua app 'trekking'.
+        # Se questa migrazione non dipende logicamente dalla 0004 per la creazione del superuser
+        # (ad esempio, se la 0004 modifica modelli non correlati), potresti ometterla,
+        # ma è prassi comune dipendere dalla migrazione precedente nella stessa app.
+        ('trekking', '0004_nome_migrazione_precedente'), 
+        
+        # Dipendenza dall'ultima migrazione conosciuta dell'app 'auth' per assicurarsi
+        # che il modello User e le tabelle relative siano create e aggiornate.
+        # '0012_alter_user_first_name_max_length' è l'ultima migrazione per l'app auth
+        # in versioni recenti di Django (incluso Django 5.0). Verifica se la tua versione
+        # di Django ne ha una più recente se incontri problemi.
+        ('auth', '0012_alter_user_first_name_max_length'),
+        
+        # Alternativa per la dipendenza dal modello User (più dinamica se usi un custom user model):
+        # migrations.swappable_dependency(settings.AUTH_USER_MODEL),
+        # Se usi questa, assicurati di importare `from django.conf import settings`.
+        # E probabilmente dovresti comunque dipendere dalla migrazione precedente della tua app 'trekking'.
     ]
 
     operations = [
