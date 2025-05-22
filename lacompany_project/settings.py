@@ -134,7 +134,7 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/topics/files/
 
 MEDIA_URL = '/media/' # <-- AGGIUNTO: URL base per servire i file media
-MEDIA_ROOT = os.path.join(BASE_DIR, 'media') # <-- AGGIUNTO: Percorso nel filesystem dove verranno salvati i file media
+MEDIA_ROOT = os.path.join(BASE_DIR, 'mediafiles') # <-- AGGIUNTO: Percorso nel filesystem dove verranno salvati i file media
 
 
 # Default primary key field type
@@ -145,9 +145,14 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles_production') # Django raccoglierà i file statici qui
 # STORAGES per WhiteNoise (Django 4.2+)
 STORAGES = {
+    "default": {
+        "BACKEND": "django.core.files.storage.FileSystemStorage",
+    },
     "staticfiles": {
+        # Probabilmente hai già una configurazione per staticfiles,
+        # ad esempio con WhiteNoise:
         "BACKEND": "whitenoise.storage.CompressedManifestStaticFilesStorage",
+        # o il default di Django:
+        # "BACKEND": "django.contrib.staticfiles.storage.StaticFilesStorage",
     },
 }
-# Per versioni Django precedenti a 4.2, si usava:
-# STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
