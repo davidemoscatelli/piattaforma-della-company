@@ -24,7 +24,7 @@
             <div class="carousel-item {% if forloop.first %}active{% endif %}">
                 <img src="{% if trek.main_image %}{{ trek.main_image.url }}{% else %}{% static 'trekking/img/placeholder_trek.jpg' %}{% endif %}"
                      class="d-block w-100 carousel-slide-img" alt="Immagine Trekking: {{ trek.name }}">
-                <div class="carousel-caption d-none d-md-block">
+                <div class="carousel-caption">
                     <h1>{{ trek.name }}</h1>
                     <p class="lead px-lg-5">{{ trek.description_short|truncatewords:25 }}</p>
                     <p>
@@ -97,54 +97,36 @@
 document.addEventListener('DOMContentLoaded', function() {
     var calendarEl = document.getElementById('homepage-calendar');
     if (calendarEl) {
+        // Determina se siamo su uno schermo piccolo
+        const isMobile = window.innerWidth < 768; // Puoi aggiustare il breakpoint 768px se necessario
+
         var calendar = new FullCalendar.Calendar(calendarEl, {
             initialView: 'dayGridMonth',
             locale: 'it',
-            headerToolbar: {
+            // Modifica la headerToolbar dinamicamente
+            headerToolbar: isMobile ? {
+                left: 'prev,next',
+                center: 'title',
+                right: 'today' // Toolbar molto più semplice per mobile
+                              // Potresti anche mettere solo 'dayGridMonth,listWeek' se vuoi la scelta
+                              // Oppure ancora più semplice: right: 'today dayGridMonth'
+            } : {
                 left: 'prev,next today',
                 center: 'title',
-                right: 'dayGridMonth,timeGridWeek,listWeek'
+                right: 'dayGridMonth,timeGridWeek,listWeek' // Toolbar completa per desktop
             },
             events: "{% url 'trekking:trekking_events_json' %}",
-            eventTimeFormat: {
-                hour: '2-digit',
-                minute: '2-digit',
-                meridiem: false,
-                hour12: false
-            },
+            eventTimeFormat: { /* ... il resto delle tue opzioni ... */ },
             displayEventEnd: false,
-            eventDidMount: function(info) {
-                if (info.event.extendedProps.description) {
-                    var tooltipContent = `
-                        <strong>${info.event.title.replace(/ \(.*/, '')}</strong><br>
-                        Data: ${new Date(info.event.start).toLocaleDateString('it-IT', { day: 'numeric', month: 'long', year: 'numeric' })}
-                        ${new Date(info.event.start).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) !== '00:00' ?
-                           ' alle ' + new Date(info.event.start).toLocaleTimeString('it-IT', { hour: '2-digit', minute: '2-digit' }) : ''}
-                        <hr class="my-1">
-                        Stato: ${info.event.extendedProps.status || 'N/D'}<br>
-                        ${info.event.extendedProps.spots_available !== undefined ?
-                           'Posti: ' + info.event.extendedProps.spots_available + '/' + info.event.extendedProps.max_participants : ''}
-                        <hr class="my-1">
-                        <em>Clicca per dettagli</em>
-                    `;
-                    var tooltip = new bootstrap.Tooltip(info.el, {
-                        title: tooltipContent,
-                        html: true,
-                        placement: 'top',
-                        trigger: 'hover focus',
-                        container: 'body',
-                        customClass: 'event-tooltip'
-                    });
-                }
-            },
-            eventClick: function(info) {
-                info.jsEvent.preventDefault();
-                if (info.event.url) {
-                    window.location.href = info.event.url;
-                }
-            }
+            eventDidMount: function(info) { /* ... il resto della tua logica ... */ },
+            eventClick: function(info) { /* ... il resto della tua logica ... */ }
         });
         calendar.render();
+
+        // Opzionale: Riascolta il ridimensionamento della finestra per aggiornare la toolbar
+        // Questo è più avanzato e potrebbe richiedere di distruggere e ricreare il calendario
+        // o usare i metodi API di FullCalendar per cambiare le opzioni dinamicamente.
+        // Per ora, la determinazione all'avvio è un buon primo passo.
     } else {
         console.error("Elemento #homepage-calendar non trovato per FullCalendar.");
     }

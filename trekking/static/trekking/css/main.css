@@ -577,3 +577,29 @@ a {
     border-color: var(--la-company-primary-darker);
     box-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
 }
+
+@media (max-width: 767px) { /* Target per schermi più piccoli del breakpoint md */
+    #homepage-calendar {
+        padding: 0.75rem; /* Riduci il padding interno del box del calendario */
+    }
+
+    #homepage-calendar .fc-toolbar-title {
+        font-size: 1.1em; /* Riduci leggermente la dimensione del titolo del mese */
+        margin: 0 0.5em; /* Aggiungi un po' di margine laterale se necessario */
+    }
+
+    #homepage-calendar .fc-button {
+        padding: 0.3em 0.4em; /* Riduci il padding dei bottoni della toolbar */
+        font-size: 0.85em;   /* Riduci la dimensione del font dei bottoni */
+    }
+    
+    /* Se il problema è che gli eventi nel mese sono troppo grandi/affollati */
+    .fc-daygrid-event .fc-event-title {
+        font-size: 0.8em; /* Riduci la dimensione del testo degli eventi nel calendario */
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis; /* Aggiunge ... se il testo dell'evento è troppo lungo */
+    }
+    /* FullCalendar V6 potrebbe usare variabili CSS, questo è un approccio generale */
+    /* Potresti anche dover ridurre --fc-daygrid-event-dot-width se usi i puntini */
+}
